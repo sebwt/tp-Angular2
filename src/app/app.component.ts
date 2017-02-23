@@ -15,11 +15,11 @@ export class AppComponent {
   total: number=0; 
   products: Product[]=[];
   constructor( public productsService: ProductsService, public customerService: CustomerService,  @Inject('titre') titre:string, public myPipe:MyPipePipe ){
-      this.products=this.productsService.getProducts();
+      this.productsService.getProducts().subscribe(products => this.products = products);
       this.title=titre;
    }
   updateTotal(product: Product){
-    this.customerService.addProduct(product);
+     this.customerService.addProduct(product);
     this.total= this.customerService.getTotal();
   }
 
