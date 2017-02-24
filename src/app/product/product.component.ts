@@ -10,7 +10,7 @@ export class ProductComponent implements OnInit {
 @Input() data:Product
 @Output() addToBasket = new EventEmitter<Product>();
 
-  constructor() { 
+  constructor() {   
   
 
   }

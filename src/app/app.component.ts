@@ -11,17 +11,6 @@ import {MyPipePipe } from './my-pipe.pipe'
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'app works!';
-  total: number=0; 
-  products: Product[]=[];
-  constructor( public productsService: ProductsService, public customerService: CustomerService,  @Inject('titre') titre:string, public myPipe:MyPipePipe ){
-      this.productsService.getProducts().subscribe(products => this.products = products);
-      this.title=titre;
-   }
-  updateTotal(product: Product){
-     this.customerService.addProduct(product);
-    this.total= this.customerService.getTotal();
-  }
 
 }
 

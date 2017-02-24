@@ -1,0 +1,25 @@
+<p>
+    basket works!
+</p>
+<div class="row text-center">
+    <ul>
+        <li *ngFor="let product of orderedProducts |myPipe:false "> {{product.title|uppercase}} - {{product.price| currency:'EUR':true}}</li>
+    </ul>
+</div>
+<div >
+    <form (ngSubmit)="validateForm()" #customerForm="ngForm" novalidate>
+            <label class="control-label" for="name">Name</label>
+            <input type="text" [(ngModel)]="curentCustomer.name" id="name" name="name" ng-required="true" class="form-control">
+         
+            <div class="form-group" [class.has-error]="!creditCard.valid">           
+                <label class="control-label" for="creditCard">creditCard</label>
+                <input type="text" [(ngModel)]="curentCustomer.creditCard" id="creditCard" name="creditCard" #creditCard="ngModel" pattern="^[0-9]{3}-[0-9]" required class="form-control">
+                <span class="help-block" [hidden]="!creditCard.valid">Invalid pattern. Example : 123-456</span>
+            </div>
+          
+            <label class="control-label" for="address">address</label>
+            <input type="textarea" [(ngModel)]="curentCustomer.address" id="address" name="address" ng-required="true" class="form-control">
+
+			<input type="submit">
+		</form>
+</div>
