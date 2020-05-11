@@ -1,0 +1,1244 @@
+openapi: "3.0.0"
+info:
+  description: "Passerelle vers *API RDV Omnicanal* pour l'appli ecole "
+  version: "0.1"
+  title: "API PassRDVO "
+  contact:
+    name: "WapiTeam"
+    email: "api.support-france@orange.com"
+paths:
+  /freeSlots:
+    get:
+      tags:
+        - "FreeSlot"
+      operationId: "freeSlotFind"
+      summary: "Chercher l'ensemble des créneaux disponibles"
+      description: "Chercher l'ensemble des créneaux disponibles"
+      parameters:
+        - name: "startDate"
+          in: "query"
+          required: true
+          description: "date de debut de la plage de recherche"
+          schema:
+            type: "string"
+            format: "date-time"
+        - name: "endDate"
+          in: "query"
+          required: true
+          description: "date de fin de la plage de recherche"
+          schema:
+            type: "string"
+            format: "date-time"
+        - name: "idAppointment"
+          in: "query"
+          required: false
+          description: "identifiant du RDV"
+          schema:
+            type: "string"
+        - name: "natureAppointmentType"
+          in: "query"
+          required: true
+          description: "type du RDV Store, a domicile, a distance…."
+          schema:
+            type: "string"
+            minLength: 1
+            enum:
+              - "STORE"
+              - "PHONE_TEAM"
+              - "PHONE_SELLER"
+              - "INTERVENTION"
+        - name: "categoryAppointmentType"
+          in: "query"
+          required: true
+          description: "type du carnet RD3+, cours particulier, espace service,"
+          schema:
+            type: "string"
+            minLength: 1
+        - name: "marketSegment"
+          in: "query"
+          required: true
+          description: "segment du marché"
+          schema:
+            type: "string"
+            minLength: 1
+            enum:
+              - "R"
+              - "P"
+              - "E"
+        - name: "keyNameExternalId"
+          in: "query"
+          required: false
+          description: "ND, n° CRM SPAS, …"
+          schema:
+            type: "array"
+            items:
+              type: "string"
+              enum:
+                - "ND_SUPPORT"
+                - "ND_IP"
+                - "ND_RTC"
+                - "AID"
+                - "NUM_SPAS"
+                - "ND_MSISDN"
+        - name: "keyValueExternalId"
+          in: "query"
+          description: "la valeur de l'identifiant externe"
+          required: false
+          schema:
+            type: "array"
+            items:
+              type: "string"
+        - name: "erdCode"
+          in: "query"
+          description: "identifiant de la boutique (store Locator)"
+          required: false
+          schema:
+            type: "string"
+        - name: "advCode"
+          in: "query"
+          description: "identifiant ADV de la boutique"
+          required: false
+          schema:
+            type: "string"
+        - name: "edoCode"
+          in: "query"
+          description: "identifiant O3 cible"
+          required: false
+          schema:
+            type: "string"
+        - name: "productClassification"
+          in: "query"
+          description: "xDSL, Fibre, mobile, …etc."
+          required: false
+          schema:
+            type: "string"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/FreeSlot"
+        400:
+          description: "Bad Request\n"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        403:
+          description: "Forbidden\n"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: "Not Found\n"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        405:
+          description: "technical Error\n"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        422:
+          description: "functionnel  Error\n"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: "Internal Server Error\n"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /appointments:
+    post:
+      tags:
+        - "Appointment"
+      operationId: "appointmentCreate"
+      summary: "Créer une instance de rendez-vous client"
+      description: "Créer une instance de l'objet rendez-vous client"
+      requestBody:
+        content:
+          application/json;charset=utf-8:
+            schema:
+              $ref: "#/components/schemas/Appointment"
+        description: "Objet rendez-vous"
+        required: true
+      responses:
+        201:
+          description: "OK"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Appointment"
+        400:
+          description: "Bad Request\n"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        403:
+          description: "Forbidden\n"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: "Not Found\n"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        405:
+          description: "technical Error\n"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        422:
+          description: "functionnel  Error\n"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: "Internal Server Error\n"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+    get:
+      tags:
+        - "Appointment"
+      operationId: "appointmentFind"
+      summary: "Filtrer des rendez-vous client"
+      description: "Permet de rechercher des rendez-vous client sur un ou plusieurs\
+        \ filtres"
+      parameters:
+        - name: "pidParty"
+          required: false
+          in: "query"
+          description: "identifiant du client"
+          schema:
+            type: "string"
+            minLength: 1
+        - name: "idetaParty"
+          required: false
+          in: "query"
+          description: "identifiant du client Pro"
+          schema:
+            type: "string"
+            minLength: 1
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Appointment"
+        400:
+          description: "Bad Request\n"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        403:
+          description: "Forbidden\n"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: "Not Found\n"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        405:
+          description: "technical Error\n"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        422:
+          description: "functionnel  Error\n"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: "Internal Server Error\n"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /appointments/{id}:
+    get:
+      tags:
+        - "Appointment"
+      operationId: "appointmentGet"
+      summary: "Chercher une instance de rendez-vous client"
+      description: "Chercher une instance de rendez-vous client"
+      parameters:
+        - name: "id"
+          required: true
+          in: "path"
+          description: "Identifiant de l'instance de rendez-vous"
+          schema:
+            type: "string"
+            minLength: 1
+        - name: "natureAppointmentType"
+          in: "query"
+          required: true
+          description: "type du RDV Store, a domicile, a distance…."
+          schema:
+            type: "string"
+            minLength: 1
+            enum:
+              - "STORE"
+              - "PHONE_TEAM"
+              - "PHONE_SELLER"
+              - "INTERVENTION"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Appointment"
+        400:
+          description: "Bad Request\n"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        403:
+          description: "Forbidden\n"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: "Not Found\n"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        405:
+          description: "technical Error\n"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        422:
+          description: "functionnel  Error\n"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: "Internal Server Error\n"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+    put:
+      tags:
+        - "Appointment"
+      operationId: "appointmentUpdate"
+      summary: "Modifier une instance de rendez-vous client"
+      description: "Opérations de modification d'une instance de rendez-vous client\
+        \ : transfert, report,  annulation..."
+      parameters:
+        - name: "id"
+          required: true
+          in: "path"
+          description: "Identifiant de l'instance de rendez-vous"
+          schema:
+            type: "string"
+            minLength: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Appointment"
+        required: true
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Appointment"
+        400:
+          description: "Bad Request\n"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        403:
+          description: "Forbidden\n"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: "Not Found\n"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: "Internal Server Error\n"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /appointments/{id}/cancel:
+    post:
+      tags:
+        - "Appointment"
+      operationId: "cancelAppointment"
+      summary: "changer statut appointment"
+      description: ""
+      parameters:
+        - name: "id"
+          required: true
+          in: "path"
+          description: "Identifiant de l'instance de rendez-vous"
+          schema:
+            type: "string"
+            minLength: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CancelAppointment"
+        description: "Informations concernants le rdv annulé"
+        required: true
+      responses:
+        200:
+          description: "OK"
+          headers:
+            X-OAPI-Application-Id:
+              description: "Code basicat de l'application appelante"
+              schema:
+                type: "string"
+            X-OAPI-Origin:
+              description: "Code basicat de l'application à l'origine de la demande"
+              schema:
+                type: "string"
+            X-OAPI-channel:
+              description: "Identifiant du canal utilise"
+              schema:
+                type: "string"
+                enum:
+                  - "WEB"
+                  - "IVR"
+                  - "STO"
+                  - "CS"
+            X-OAPI-User-Id:
+              description: "Identifiant du vendeur ou utilisateur final"
+              schema:
+                type: "string"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Appointment"
+        400:
+          description: "Bad Request\n"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        403:
+          description: "Forbidden\n"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: "Not Found\n"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        405:
+          description: "technical Error\n"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        422:
+          description: "functionnel  Error\n"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: "Internal Server Error\n"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /appointments/{id}/replicate:
+    post:
+      tags:
+        - "Appointment"
+      operationId: "replicateAppointment"
+      summary: "replicate appointment to pns"
+      description: ""
+      parameters:
+        - name: "X-OAPI-TTL"
+          required: true
+          in: "header"
+          description: "Time to Live Rdvz"
+          schema:
+            type: "string"
+            minLength: 1
+        - name: "X-OAPI-TS"
+          required: true
+          in: "header"
+          description: "Time stamp"
+          schema:
+            type: "string"
+            minLength: 1
+        - name: "id"
+          required: true
+          in: "path"
+          description: "Identifiant de l'instance de rendez-vous"
+          schema:
+            type: "string"
+            minLength: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Appointment"
+        description: "Informations concernants le rdv annulé"
+        required: true
+      responses:
+        204:
+          description: "OK"
+          headers:
+            X-OAPI-TTL:
+              description: "Time to Live Rdvz"
+              schema:
+                type: "string"
+            X-OAPI-TS:
+              description: "Time to Live Rdvz"
+              schema:
+                type: "string"
+        400:
+          description: "Bad Request\n"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        403:
+          description: "Forbidden\n"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: "Not Found\n"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        405:
+          description: "technical Error\n"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        422:
+          description: "functionnel  Error\n"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: "Internal Server Error\n"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /stores:
+    get:
+      tags:
+        - "Stores"
+      operationId: "storeFind"
+      summary: "Rechercher des boutiques à partir d'un type de RDV"
+      description: "Rechercher des boutiques à partir d'un type de RDV"
+      parameters:
+        - name: "appointmentCategory"
+          required: true
+          in: "query"
+          description: "type du carnet RD3+, cours particulier, espace service,..."
+          schema:
+            type: "string"
+            minLength: 1
+        - name: "planning"
+          required: false
+          in: "query"
+          description: "état du planning"
+          schema:
+            type: "string"
+            enum:
+              - "ALL"
+              - "OPEN"
+              - "AVAILABLE"
+            default: "ALL"
+        - name: "startDate"
+          in: "query"
+          required: true
+          description: "date de debut de la plage de recherche"
+          schema:
+            type: "string"
+            format: "date-time"
+        - name: "endDate"
+          in: "query"
+          required: true
+          description: "date de fin de la plage de recherche"
+          schema:
+            type: "string"
+            format: "date-time"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Store"
+        400:
+          description: "Bad Request\n"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        403:
+          description: "Forbidden\n"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: "Not Found\n"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        405:
+          description: "technical Error\n"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        422:
+          description: "functionnel  Error\n"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: "Internal Server Error\n"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /storeAppointmentTypes:
+    get:
+      tags:
+        - "StoreAppointmentTypes"
+      operationId: "appointmentTypeFind"
+      summary: "Rechercher des types de RDV associés à une boutique"
+      description: "Rechercher des types de RDV associés à une boutique"
+      parameters:
+        - name: "erdCode"
+          in: "query"
+          description: "identifiant de la boutique (store Locator)"
+          required: false
+          schema:
+            type: "string"
+        - name: "advCode"
+          in: "query"
+          description: "identifiant ADV de la boutique"
+          required: false
+          schema:
+            type: "string"
+        - name: "edoCode"
+          in: "query"
+          description: "identifiant O3 cible"
+          required: false
+          schema:
+            type: "string"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/StoreAppointmentType"
+        400:
+          description: "Bad Request\n"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        403:
+          description: "Forbidden\n"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: "Not Found\n"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        405:
+          description: "technical Error\n"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        422:
+          description: "functionnel  Error\n"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: "Internal Server Error\n"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /reasons:
+    get:
+      tags:
+        - "Reasons"
+      operationId: "reasonsFind"
+      summary: "Rechercher les raisons liés à un rdv type"
+      description: "Rechercher les raisons liés à un rdv type"
+      parameters:
+        - name: "natureAppointmentType"
+          in: "query"
+          description: "rdv nature"
+          required: true
+          schema:
+            type: "string"
+            minLength: 1
+            enum:
+              - "STORE"
+              - "PHONE_TEAM"
+              - "PHONE_SELLER"
+              - "INTERVENTION"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Reasons"
+        400:
+          description: "Bad Request\n"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        403:
+          description: "Forbidden\n"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        404:
+          description: "Not Found\n"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        405:
+          description: "technical Error\n"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        422:
+          description: "functionnel  Error\n"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: "Internal Server Error\n"
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Error"
+servers:
+  - url: "https://obot-rdvopass-dev.app.cloudfoundry-cluster1-z2.itn.intraorange"
+    description: "rvo-passerelle "
+components:
+  parameters:
+    offsetParam:
+      name: "offset"
+      in: "query"
+      description: "indexe du premier élément à récuperer"
+      required: false
+      schema:
+        type: "integer"
+        format: "int32"
+    limitParam:
+      name: "limit"
+      in: "query"
+      description: "nombre max d'enregistrments de la liste à retourner"
+      required: false
+      schema:
+        type: "integer"
+        format: "int32"
+  securitySchemes:
+    m2mSecurityScheme:
+      type: "oauth2"
+      flows:
+        clientCredentials:
+          tokenUrl: "https://okapi-v2.hbx.geo.francetelecom.fr/v2/token"
+          scopes:
+            api-rdv_omnicanal_release-v1-acc:read: "lecture"
+            api-rdv_omnicanal_release-v1-acc:readwrite: "ecriture"
+  schemas:
+    Modele_a_copier_coller:
+      description: "Definition de la ressource"
+      type: "object"
+      required:
+        - "champs_integer"
+      properties:
+        champs_integer:
+          description: ""
+          type: "integer"
+          format: "int32/int64"
+        champs_string:
+          description: ""
+          type: "string"
+        champs_numTel:
+          description: ""
+          type: "string"
+          pattern: "^\\+*[0-9]{2,15}$"
+        champs_enum:
+          type: "string"
+          description: ""
+          default: "VAL1"
+          enum:
+            - "VAL1"
+            - "VAL2"
+        champs_date:
+          description: ""
+          type: "string"
+          format: "date"
+    FreeSlot:
+      description: "Créneau horaire disponible"
+      type: "object"
+      required:
+        - "startDate"
+        - "endDate"
+      properties:
+        id:
+          description: "identifiant du créneau"
+          type: "string"
+        startDate:
+          description: "Date de début du créneau disponible"
+          type: "string"
+          format: "date-time"
+        endDate:
+          description: "Date de fin du créneau disponible"
+          type: "string"
+          format: "date-time"
+        bookPriority:
+          description: "priorité (spécifique Hagrid)"
+          type: "string"
+    Party:
+      description: "Informations concernants la personne associée au RDV"
+      type: "object"
+      required:
+        - "lastName"
+        - "phoneContact"
+      properties:
+        pid:
+          description: "identifiant du client"
+          type: "string"
+        ideta:
+          description: "identifiant du client PRO"
+          type: "string"
+        contractId:
+          description: "identifiant du contrat client"
+          type: "string"
+        firstName:
+          description: "prénom du client"
+          type: "string"
+        lastName:
+          description: "nom de famille du client"
+          type: "string"
+          minLength: 1
+        tradingName:
+          description: "Raison sociale pour un client pro"
+          type: "string"
+        phoneContact:
+          description: "numero mobile ou fixe de contact"
+          type: "string"
+          pattern: "^\\+*[0-9]{10,15}$"
+        emailAddress:
+          description: "adresse email du contact client"
+          type: "string"
+          pattern: "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
+        address:
+          description: "adresse postal de la personne"
+          type: "string"
+        postalCode:
+          description: "code postal de la personne"
+          type: "string"
+        locality:
+          description: "ville de la personne"
+          type: "string"
+    ExternalId:
+      description: "Informations concernants les cles references externes"
+      type: "object"
+      required:
+        - "keyName"
+        - "keyValue"
+      properties:
+        keyName:
+          description: "ND, n° CRM SPAS, …"
+          type: "string"
+          enum:
+            - "ND_SUPPORT"
+            - "ND_IP"
+            - "ND_RTC"
+            - "AID"
+            - "NUM_SPAS"
+            - "ND_MSISDN"
+        keyValue:
+          description: "la valeur du identiant externe"
+          type: "string"
+          minLength: 1
+    StoreSpecification:
+      description: "Informations concernants la boutique du RDV"
+      type: "object"
+      properties:
+        erdCode:
+          description: "identifiant de la boutique (store Locator) - dep"
+          type: "string"
+        advCode:
+          description: "identifiant ADV de la boutique -  dep"
+          type: "string"
+        edoCode:
+          description: "identifiant O3 cible"
+          type: "string"
+        storeName:
+          description: "nom de la boutique du rendez-vous"
+          type: "string"
+        storeAddress:
+          description: "adresse de la boutique du rendez vous"
+          type: "string"
+    Seller:
+      description: "Informations concernants le vendeur associé au RDV"
+      type: "object"
+      required:
+        - "cuid"
+      properties:
+        cuid:
+          description: "identifiant du vendeur"
+          type: "string"
+          minLength: 1
+        firstName:
+          description: "nom du vendeur"
+          type: "string"
+        lastName:
+          description: "prenom du vendeur"
+          type: "string"
+        emailAddress:
+          description: "adresse email du vendeur"
+          type: "string"
+          format: "email"
+    Note:
+      description: "Informations concernants les notes associées au RDV"
+      required:
+        - "text"
+      properties:
+        date:
+          description: "date de la note"
+          type: "string"
+          format: "date-time"
+        author:
+          description: "nom prénom ou CUID de l'auteur de la note"
+          type: "string"
+        text:
+          description: "texte de la note associée"
+          type: "string"
+          minLength: 1
+    Appointment:
+      description: "RDV"
+      type: "object"
+      required:
+        - "relatedParty"
+        - "relatedAppointmentType"
+        - "startDate"
+      properties:
+        id:
+          description: "identifiant du RDV"
+          type: "string"
+        idFreeSlot:
+          description: "identifiant du créneau (meme id téchnique)"
+          type: "string"
+        startDate:
+          description: "date de debut du créneau (date inclut)"
+          type: "string"
+          format: "date-time"
+        endDate:
+          description: "date de fin du créneau (date inclut)"
+          type: "string"
+          format: "date-time"
+        dateChangeOfStatus:
+          description: "date de changement de status"
+          type: "string"
+          format: "date-time"
+        dateChangeOfAppointment:
+          description: "date de changement de rendez vous"
+          type: "string"
+          format: "date-time"
+        relatedReasons:
+          description: "motif de rdv"
+          type: "array"
+          items:
+            $ref: "#/components/schemas/AppointmentReason"
+        state:
+          description: "non rensiegné pour la création"
+          type: "string"
+          enum:
+            - "CREATED"
+            - "MODIFIED"
+            - "POSTPONED"
+            - "CANCELED"
+            - "TREATED"
+            - "TRANSFERRED"
+            - "AFFECTED"
+        noteCustomer:
+          description: "description du RDV par le client"
+          type: "array"
+          items:
+            type: "string"
+        emailNotice:
+          description: "notifications par email"
+          type: "boolean"
+          default: false
+        smsNotice:
+          description: "notifications par SMS"
+          type: "boolean"
+          default: false
+        marketSegment:
+          description: "segment du marché"
+          type: "string"
+          enum:
+            - "R"
+            - "P"
+            - "E"
+        relatedAppointmentType:
+          $ref: "#/components/schemas/AppointmentType"
+        relatedExternalIds:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/ExternalId"
+        relatedParty:
+          $ref: "#/components/schemas/Party"
+        relatedStore:
+          $ref: "#/components/schemas/StoreSpecification"
+        relatedSeller:
+          $ref: "#/components/schemas/Seller"
+        relatedNote:
+          $ref: "#/components/schemas/Note"
+    Store:
+      description: "Informations concernant les boutiques"
+      type: "object"
+      required:
+        - "planning"
+      properties:
+        erdCode:
+          description: "identifiant de la boutique (store Locator) - dep"
+          type: "string"
+        advCode:
+          description: "identifiant ADV de la boutique -  dep"
+          type: "string"
+        edoCode:
+          description: "identifiant O3 cible"
+          type: "string"
+        planning:
+          description: "état du planning"
+          type: "string"
+          enum:
+            - "ALL"
+            - "OPEN"
+            - "CLOSE"
+            - "AVAILABLE"
+    AppointmentType:
+      description: "informations concernants les types de RDV (private)"
+      required:
+        - "nature"
+        - "category"
+      properties:
+        nature:
+          description: "type du RDV Store, a domicile, a distance…."
+          type: "string"
+          enum:
+            - "STORE"
+            - "PHONE_TEAM"
+            - "PHONE_SELLER"
+            - "INTERVENTION"
+        category:
+          description: "type du carnet RD3+, cours particulier, espace service, …\
+            etc."
+          type: "string"
+          minLength: 1
+    StoreAppointmentType:
+      description: "informations concernants les types de RDV lié au boutique (public)"
+      required:
+        - "nature"
+        - "category"
+        - "planning"
+      properties:
+        nature:
+          description: "type du RDV Store, a domicile, a distance…."
+          type: "string"
+          enum:
+            - "STORE"
+            - "PHONE_TEAM"
+            - "PHONE_SELLER"
+            - "INTERVENTION"
+        category:
+          description: "type du carnet RD3+, cours particulier, espace service, …\
+            etc."
+          type: "string"
+          minLength: 1
+        planning:
+          description: "type du RDV Store, a domicile, a distance…."
+          type: "string"
+          enum:
+            - "ALL"
+            - "OPEN"
+            - "CLOSE"
+        RelatedReasons:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/ReasonsStoreAppointmentType"
+    Reasons:
+      description: "Représentation d’un motif associé à un type de rendez-vous"
+      required:
+        - "id"
+      properties:
+        id:
+          description: "identifiant de produit"
+          type: "string"
+          minLength: 1
+        description:
+          description: "description de produit"
+          type: "string"
+        category:
+          description: "catégorie de produit"
+          type: "string"
+        AppointmentTypes:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/AppointmentType"
+    AppointmentReason:
+      description: "Représentation d’un motif associé à un rdv"
+      required:
+        - "id"
+      properties:
+        id:
+          description: "identifiant de produit"
+          type: "string"
+          minLength: 1
+        description:
+          description: "description de produit"
+          type: "string"
+        category:
+          description: "catégorie de produit"
+          type: "string"
+    Error:
+      description: "Error"
+      type: "object"
+      required:
+        - "code"
+        - "message"
+      properties:
+        code:
+          description: ""
+          type: "integer"
+          format: "int32"
+        message:
+          description: ""
+          type: "string"
+        description:
+          description: ""
+          type: "string"
+        infoURL:
+          description: ""
+          type: "string"
+    CancelAppointment:
+      description: "Représentation d’un rdv annulé"
+      required:
+        - "natureAppointmentType"
+      properties:
+        startDate:
+          description: "date de debut du creneau"
+          type: "string"
+          format: "date-time"
+        endDate:
+          description: "date de fin du creneau"
+          type: "string"
+          format: "date-time"
+        natureAppointmentType:
+          description: "type du RDV Store, a domicile, a distance…."
+          type: "string"
+          enum:
+            - "STORE"
+            - "PHONE_TEAM"
+            - "PHONE_SELLER"
+            - "INTERVENTION"
+        relatedNote:
+          $ref: "#/components/schemas/Note"
+    ReasonsStoreAppointmentType:
+      description: "informations concernant les motifs"
+      required:
+        - "id"
+      properties:
+        id:
+          description: "identifiant du motif"
+          type: "string"
+          minLength: 1
+        description:
+          description: "description du motif"
+          type: "string"
+  links: {}
+  callbacks: {}
+security:
+  - m2mSecurityScheme:
+      - "api-rdv_omnicanal_release-v1-acc:read"
+      - "api-rdv_omnicanal_release-v1-acc:readwrite"
